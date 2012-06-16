@@ -31,8 +31,21 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.ImageView;
 
+/**
+ * Note the pattern: many instance methods are proxies to a static one with
+ * many parameters that can accept null.
+ *
+ */
 public final class UrlImageViewHelper {
+	
     private static final String LOGTAG = "UrlImageViewHelper";
+    
+    /**
+     * @param input
+     * @param output
+     * @return
+     * @throws IOException
+     */
     public static int copyStream(InputStream input, OutputStream output) throws IOException
     {
         byte[] stuff = new byte[1024];
@@ -48,6 +61,15 @@ public final class UrlImageViewHelper {
 
     static Resources mResources;
     static DisplayMetrics mMetrics;
+    
+    
+    /**
+     * Init resources related objects belonging to context provided.
+     * Resources also embed infos on metrics, this is what is really useful
+     * for our purpose.
+     * 
+     * @param context
+     */
     private static void prepareResources(Context context) {
         if (mMetrics != null)
             return;
@@ -58,8 +80,16 @@ public final class UrlImageViewHelper {
         mResources = new Resources(mgr, mMetrics, context.getResources().getConfiguration());
     }
 
+    /**
+     * Load drawable with the aid of info in Resources (created from context) 
+     * 
+     * @param context
+     * @param stream
+     * @return
+     */
     private static BitmapDrawable loadDrawableFromStream(Context context, InputStream stream) {
         prepareResources(context);
+        // XXX may this be done with a static method from Drawable?
         final Bitmap bitmap = BitmapFactory.decodeStream(stream);
         //Log.i(LOGTAG, String.format("Loaded bitmap (%dx%d).", bitmap.getWidth(), bitmap.getHeight()));
         return new BitmapDrawable(mResources, bitmap);
@@ -74,34 +104,76 @@ public final class UrlImageViewHelper {
     public static final int CACHE_DURATION_SIX_DAYS = CACHE_DURATION_ONE_DAY * 6;
     public static final int CACHE_DURATION_ONE_WEEK = CACHE_DURATION_ONE_DAY * 7;
 
+    /**
+     * @param imageView
+     * @param url
+     * @param defaultResource
+     */
     public static void setUrlDrawable(final ImageView imageView, final String url, int defaultResource) {
         setUrlDrawable(imageView.getContext(), imageView, url, defaultResource, CACHE_DURATION_THREE_DAYS);
     }
 
+    /**
+     * @param imageView
+     * @param url
+     */
     public static void setUrlDrawable(final ImageView imageView, final String url) {
         setUrlDrawable(imageView.getContext(), imageView, url, null, CACHE_DURATION_THREE_DAYS, null);
     }
 
+    /**
+     * @param context
+     * @param url
+     */
     public static void loadUrlDrawable(final Context context, final String url) {
         setUrlDrawable(context, null, url, null, CACHE_DURATION_THREE_DAYS, null);
     }
 
+    /**
+     * @param imageView
+     * @param url
+     * @param defaultDrawable
+     */
     public static void setUrlDrawable(final ImageView imageView, final String url, Drawable defaultDrawable) {
         setUrlDrawable(imageView.getContext(), imageView, url, defaultDrawable, CACHE_DURATION_THREE_DAYS, null);
     }
 
+    /**
+     * @param imageView
+     * @param url
+     * @param defaultResource
+     * @param cacheDurationMs
+     */
     public static void setUrlDrawable(final ImageView imageView, final String url, int defaultResource, long cacheDurationMs) {
         setUrlDrawable(imageView.getContext(), imageView, url, defaultResource, cacheDurationMs);
     }
 
+    /**
+     * @param context
+     * @param url
+     * @param cacheDurationMs
+     */
     public static void loadUrlDrawable(final Context context, final String url, long cacheDurationMs) {
         setUrlDrawable(context, null, url, null, cacheDurationMs, null);
     }
 
+    /**
+     * @param imageView
+     * @param url
+     * @param defaultDrawable
+     * @param cacheDurationMs
+     */
     public static void setUrlDrawable(final ImageView imageView, final String url, Drawable defaultDrawable, long cacheDurationMs) {
         setUrlDrawable(imageView.getContext(), imageView, url, defaultDrawable, cacheDurationMs, null);
     }
 
+    /**
+     * @param context
+     * @param imageView
+     * @param url
+     * @param defaultResource
+     * @param cacheDurationMs
+     */
     private static void setUrlDrawable(final Context context, final ImageView imageView, final String url, int defaultResource, long cacheDurationMs) {
         Drawable d = null;
         if (defaultResource != 0)
@@ -109,34 +181,84 @@ public final class UrlImageViewHelper {
         setUrlDrawable(context, imageView, url, d, cacheDurationMs, null);
     }
 
+    /**
+     * @param imageView
+     * @param url
+     * @param defaultResource
+     * @param callback
+     */
     public static void setUrlDrawable(final ImageView imageView, final String url, int defaultResource, UrlImageViewCallback callback) {
         setUrlDrawable(imageView.getContext(), imageView, url, defaultResource, CACHE_DURATION_THREE_DAYS, callback);
     }
 
+    /**
+     * @param imageView
+     * @param url
+     * @param callback
+     */
     public static void setUrlDrawable(final ImageView imageView, final String url, UrlImageViewCallback callback) {
         setUrlDrawable(imageView.getContext(), imageView, url, null, CACHE_DURATION_THREE_DAYS, callback);
     }
 
+    /**
+     * @param context
+     * @param url
+     * @param callback
+     */
     public static void loadUrlDrawable(final Context context, final String url, UrlImageViewCallback callback) {
         setUrlDrawable(context, null, url, null, CACHE_DURATION_THREE_DAYS, callback);
     }
 
+    /**
+     * @param imageView
+     * @param url
+     * @param defaultDrawable
+     * @param callback
+     */
     public static void setUrlDrawable(final ImageView imageView, final String url, Drawable defaultDrawable, UrlImageViewCallback callback) {
         setUrlDrawable(imageView.getContext(), imageView, url, defaultDrawable, CACHE_DURATION_THREE_DAYS, callback);
     }
 
+    /**
+     * @param imageView
+     * @param url
+     * @param defaultResource
+     * @param cacheDurationMs
+     * @param callback
+     */
     public static void setUrlDrawable(final ImageView imageView, final String url, int defaultResource, long cacheDurationMs, UrlImageViewCallback callback) {
         setUrlDrawable(imageView.getContext(), imageView, url, defaultResource, cacheDurationMs, callback);
     }
 
+    /**
+     * @param context
+     * @param url
+     * @param cacheDurationMs
+     * @param callback
+     */
     public static void loadUrlDrawable(final Context context, final String url, long cacheDurationMs, UrlImageViewCallback callback) {
         setUrlDrawable(context, null, url, null, cacheDurationMs, callback);
     }
 
+    /**
+     * @param imageView
+     * @param url
+     * @param defaultDrawable
+     * @param cacheDurationMs
+     * @param callback
+     */
     public static void setUrlDrawable(final ImageView imageView, final String url, Drawable defaultDrawable, long cacheDurationMs, UrlImageViewCallback callback) {
         setUrlDrawable(imageView.getContext(), imageView, url, defaultDrawable, cacheDurationMs, callback);
     }
 
+    /**
+     * @param context
+     * @param imageView
+     * @param url
+     * @param defaultResource
+     * @param cacheDurationMs
+     * @param callback
+     */
     private static void setUrlDrawable(final Context context, final ImageView imageView, final String url, int defaultResource, long cacheDurationMs, UrlImageViewCallback callback) {
         Drawable d = null;
         if (defaultResource != 0)
@@ -144,6 +266,10 @@ public final class UrlImageViewHelper {
         setUrlDrawable(context, imageView, url, d, cacheDurationMs, callback);
     }
 
+    /**
+     * @param s
+     * @return boolean
+     */
     private static boolean isNullOrEmpty(CharSequence s) {
         return (s == null || s.equals("") || s.equals("null") || s.equals("NULL"));
     }
@@ -154,6 +280,10 @@ public final class UrlImageViewHelper {
         return "" + url.hashCode() + ".urlimage";
     }
 
+    /**
+     * Deletes files. Note that files are bound to context.
+     * @param context
+     */
     private static void cleanup(Context context) {
         if (mHasCleaned)
             return;
@@ -177,6 +307,16 @@ public final class UrlImageViewHelper {
         }
     }
 
+    /**
+     * The method who does the dirty job.
+     * 
+     * @param context
+     * @param imageView
+     * @param url
+     * @param defaultDrawable
+     * @param cacheDurationMs
+     * @param callback
+     */
     private static void setUrlDrawable(final Context context, final ImageView imageView, final String url, final Drawable defaultDrawable, long cacheDurationMs, final UrlImageViewCallback callback) {
         cleanup(context);
         // disassociate this ImageView from any pending downloads
